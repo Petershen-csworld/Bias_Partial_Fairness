@@ -180,7 +180,6 @@ orig_gender_known_female =  sensitive_attr[sensitive_attr["gender"] == 1]["user_
 
 pred_all_label = classifier_model(user_embedding).max(1).indices
 
-# 将已知的敏感属性复制回去
 pred_all_label[orig_gender_known_male] = 0
 pred_all_label[orig_gender_known_female] = 1
 

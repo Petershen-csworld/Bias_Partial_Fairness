@@ -6,14 +6,11 @@ from sklearn.metrics import accuracy_score
 
 
 # model evaluation: hit rate and NDCG
-# 古老版本，比较慢，用后面的
-# 直接使用sklearn实现，应该是对的。结果和后面自己写的fast evaluation一样
+
 def evaluate_model(model,df_val,top_K, device):
     model.eval()
     avg_UAUC = np.zeros((max(df_val["user_id"].unique()) + 1))
     avg_NDCG = np.zeros((max(df_val["user_id"].unique()) + 1))
-
-    # 如果只有一个rating，不参与NDCG和UAUC计算
     uniq_count= 0
     
     for i in df_val["user_id"].unique():
@@ -59,7 +56,6 @@ def evaluate_model_performance_and_naive_fairness(model, df_val, df_sensitive_at
         test_item_total = torch.tensor(np.array(df_val["item_id"])).to(device)
         pred_total = model(test_user_total, test_item_total)
         pred_total = pred_total.cpu().detach().numpy()
-        # 如果只有一个rating，不参与NDCG和UAUC计算
         uniq_count= 0
         naive_fairness_dict = {i:[] for i in df_sensitive_attr["gender"].unique()}
         df_val_with_index = df_val.reset_index()
@@ -95,9 +91,7 @@ def DCG(label_list):
         dcgsum += dcg
     return dcgsum
 
-#ndcg 计算
 def NDCG(label_list,top_n):
-    #没有设定topn
     if top_n==None:
         dcg = DCG(label_list)
         ideal_list = sorted(label_list, reverse=True)
@@ -105,7 +99,6 @@ def NDCG(label_list,top_n):
         if ideal_dcg == 0:
             return 0
         return dcg/ideal_dcg
-    #设定top n
     else:
         dcg = DCG(label_list[0:top_n])
         ideal_list = sorted(label_list, reverse=True)
@@ -115,7 +108,6 @@ def NDCG(label_list,top_n):
         return dcg/ideal_dcg
 
 def calAUC(label_list):
-    # AUC 计算需要倒序
     rank = label_list[::-1]
     rankList = [i + 1 for i in range(len(rank)) if rank[i] == 1]
     posNum = sum(rank)
@@ -140,7 +132,6 @@ def evaluate_model_performance_and_naive_fairness_fast(model, df_val, df_sensiti
         test_item_total = torch.tensor(np.array(df_val["item_id"])).to(device)
         pred_total = model(test_user_total, test_item_total)
         pred_total = pred_total.cpu().detach()
-        # 如果只有一个rating，不参与NDCG和UAUC计算
         uniq_count= 0
         naive_fairness_dict = {i:[] for i in df_sensitive_attr["gender"].unique()}
         df_val_with_index = df_val.reset_index()
@@ -174,7 +165,6 @@ def evaluate_model_performance_and_naive_fairness_EO_fast(model, df_val, df_sens
         test_item_total = torch.tensor(np.array(df_val["item_id"])).to(device)
         pred_total = model(test_user_total, test_item_total)
         pred_total = pred_total.cpu().detach()
-        # 如果只有一个rating，不参与NDCG和UAUC计算
         uniq_count= 0
         naive_fairness_dict = {i:[] for i in df_sensitive_attr["gender"].unique()}
         df_val_with_index = df_val.reset_index()
@@ -212,7 +202,6 @@ def evaluation_gender(data, label, model):
 
 
 
-# 当使用partial 的时候，只使用已知敏感属性的部分去参与fairness的计算，并汇报
 def evaluate_model_performance_and_naive_fairness_fast_partial_valid(model, df_val, df_sensitive_attr, gender_known_male, gender_known_female, top_K, device):
     model.eval()
     avg_UAUC = np.zeros((max(df_val["user_id"].unique()) + 1))
@@ -222,7 +211,6 @@ def evaluate_model_performance_and_naive_fairness_fast_partial_valid(model, df_v
         test_item_total = torch.tensor(np.array(df_val["item_id"])).to(device)
         pred_total = model(test_user_total, test_item_total)
         pred_total = pred_total.cpu().detach()
-        # 如果只有一个rating，不参与NDCG和UAUC计算
         uniq_count= 0
         fairness_count = 0
         naive_fairness_dict = {i:[] for i in df_sensitive_attr["gender"].unique()}
@@ -239,7 +227,6 @@ def evaluate_model_performance_and_naive_fairness_fast_partial_valid(model, df_v
                 avg_NDCG[name] = NDCG(label_rank, top_K)
                 avg_UAUC[name] = calAUC(label_rank)
                 uniq_count += 1
-            # 在partial evaluation 的时候，只对知道敏感属性的用户计算fairness指标
             if (name in gender_known_male) or (name in gender_known_female): 
                 gender = int(df_sensitive_dict.iloc[name]["gender"])
                 naive_fairness_dict[gender] += y_hat.tolist()

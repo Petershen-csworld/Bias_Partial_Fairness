@@ -85,7 +85,6 @@ classifier_model = sst_pred(user_embedding.shape[1], 32, 2).to(device)
 # no validation set
 
 # construct test set
-# 一个测试集:全部样本作为测试集
 
 sensitive_attr_reshuffled = sensitive_attr.sample(frac=1).reset_index(drop=True)
 test_known_male = sensitive_attr_reshuffled[sensitive_attr_reshuffled["gender"] == 0]["user_id"].to_numpy()[: int(args.partial_ratio_male * sum(sensitive_attr_reshuffled["gender"] == 0))]
@@ -93,7 +92,6 @@ test_known_female = sensitive_attr_reshuffled[sensitive_attr_reshuffled["gender"
 test_tensor = torch.cat([user_embedding[test_known_male], user_embedding[test_known_female]])
 test_label = torch.cat([torch.zeros(test_known_male.shape[0]), torch.ones(test_known_female.shape[0])]).to(device)
 
-# 另一个测试集:未见过的20%用户
 
 test_tensor_unseen = torch.cat([user_embedding[gender_known_male_test], user_embedding[gender_known_female_test]])
 test_label_unseen = torch.cat([torch.zeros(gender_known_male_test.shape[0]), torch.ones(gender_known_female_test.shape[0])]).to(device)
@@ -101,7 +99,6 @@ test_label_unseen = torch.cat([torch.zeros(gender_known_male_test.shape[0]), tor
 
 
 # resample male
-# 如果根据oracle 的样本数量采样大于已知样本，就直接将已知的所有样本放进去
 
 np.random.seed(args.seed)
 if int(len(gender_known_female) * args.prior_male_female_ratio_resample) < len(gender_known_male):
@@ -140,7 +137,6 @@ gender_known_female =  sensitive_attr[sensitive_attr["gender"] == 1]["user_id"].
 
 pred_all_label = classifier_model(user_embedding).max(1).indices
 
-# 将已知的敏感属性复制回去
 pred_all_label[gender_known_male] = 0
 pred_all_label[gender_known_female] = 1
 

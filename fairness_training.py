@@ -22,8 +22,8 @@ from tqdm import tqdm
 
 # Train the model with fairness regularization 
 def pretrain_epochs_with_predicted_sst_reg_eval_unfairness_valid_partial(model, df_train, epochs, lr, weight_decay, batch_size, valid_data, test_data, predicted_sensitive_attr, oracle_sensitive_attr, top_K, fair_reg, gender_known_male, gender_known_female, device, evaluation_epoch=10, unsqueeze=False, shuffle=True):
-    criterion = nn.BCELoss() # 损失函数
-    optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay) # 带L2 正则的优化器
+    criterion = nn.BCELoss() 
+    optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay) 
     model.train()
     best_val_ndcg = 0 
     test_ndcg_in_that_epoch = 0
@@ -53,7 +53,6 @@ def pretrain_epochs_with_predicted_sst_reg_eval_unfairness_valid_partial(model, 
             y_hat = model(train_user_input, train_item_input)
             loss = criterion(y_hat, train_ratings.view(-1))
             loss_total += loss.item()
-            # 公平性正则项 
             # fairness regulation
             fair_regulation = torch.abs((y_hat[train_user_sst == 1]).mean() - (y_hat[train_user_sst == 0]).mean()) * fair_reg
             fair_reg_total += fair_regulation.item()
@@ -98,7 +97,7 @@ def pretrain_epochs_with_resampled_ensemble_sst_reg_eval_unfairness_valid_partia
                                                                              evaluation_epoch=3, unsqueeze=False, shuffle=True):
     # obselete version
     criterion = nn.BCELoss() 
-    optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay) # 带L2 正则的优化器
+    optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
     model.train()
     best_val_ndcg = 0 
     test_ndcg_in_that_epoch = 0
