@@ -35,11 +35,11 @@ attributes.
 
 on **ml-1m**  
 ```bash
-bash ./scripts/contrast/change_ratio_and_epoch/partial_ratio_male0.5/run_ml_1m.sh
+bash ./scripts/predict_sst/run_ml_1m.sh
 ```
 on **Lastfm-360K**
 ```bash 
-bash ./scripts/contrast/change_ratio_and_epoch/partial_ratio_male0.5/run_Lastfm_360K.sh
+bash ./scripts/predict_sst/run_Lastfm_360K.sh
 ```
 
 
