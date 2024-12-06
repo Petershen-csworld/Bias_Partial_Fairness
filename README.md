@@ -1,5 +1,18 @@
 # Fair Recommendation with Biased Limited Sensitive Attribute
 
+![Intro](./assets/intro.png)
+# Folder & File structure 
+- `./datasets` : Here are the processed **ML-1M** and **LastFM-360K** datasets.
+- `./pretrained_model` : Here are the pretrained **ML-1M** and **LastFM-360K** MF models. (No fair regularization)
+- `./scripts` : Here are the training scripts.
+- `./collaborative_models.py`: NCF model.
+-  `./MF_explicit_fairness_fast_eval_partial_shuffle.py`: For MF pretraining.
+- `./predict_sst.py` : Reconstruction of sensitive attributes using multiple priors.
+- `./mpr_safe.py` : Use MPR for fairness training.
+- `./fairness_training.py, evaluation.py`: Training utilities.
+- `./contrast.py` : We use it to verify the existence of bias.
+
+
 # Dataset
 You can download the original dataset from the following links:
 [ml-1m](https://grouplens.org/datasets/movielens/1m/)
@@ -29,9 +42,9 @@ bash ./scripts/contrast/change_ratio_and_epoch/partial_ratio_male0.5/run_Lastfm_
 ```
 
 ## 3. Create Multiple priority
-We first establish a predefined set of prior distributions $\mathcal{P}$, which in our setting is $\{ 1/10.0, 1/9.5, 1/9.0, \cdots, 1/1.5, 1, 1.5, 2, \cdots, 9.5, 10 \}$
+We first establish a predefined set of prior distributions $\mathcal{P}$, which in our setting is $\{ 1/10.0, 1/9.5, 1/9.0, \cdots, 1/1.5, 1, 1.5, 2, \cdots, 9.5, 10 \}$.
 We then estimate the distribution of users’ sensitive attributes under each prior distribution $\hat{p}_0 \in \mathcal{P}$ by resampling the known sensitive
-attributes.
+attributes. 
 
 on **ml-1m**  
 ```bash
